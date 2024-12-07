@@ -22,6 +22,24 @@ using namespace std::chrono;
 // Функция-обработчик операции приготовления хот-дога
 using HotDogHandler = std::function<void(Result<HotDog> hot_dog)>;
 
+class ThreadChecker {
+   public:
+    explicit ThreadChecker(std::atomic_int& counter) : counter_{counter} {}
+
+    ThreadChecker(const ThreadChecker&) = delete;
+    ThreadChecker& operator=(const ThreadChecker&) = delete;
+
+    ~ThreadChecker() {
+        // assert выстрелит, если между вызовом конструктора и деструктора
+        // значение expected_counter_ изменится
+        assert(expected_counter_ == counter_);
+    }
+
+   private:
+    std::atomic_int& counter_;
+    int expected_counter_ = ++counter_;
+};
+
 class Order : public std::enable_shared_from_this<Order> {
    public:
     Order(net::io_context& io, int id, Store& store, GasCooker& gas_cooker,
@@ -52,6 +70,7 @@ class Order : public std::enable_shared_from_this<Order> {
     std::shared_ptr<Sausage> sausage_;
     HotDogHandler handler_;
     bool is_ready_ = false;
+    std::atomic_int counter_{0};
 
     void FrySausage() {
         sausage_->StartFry(gas_cooker_, [self = shared_from_this()]() {
@@ -77,11 +96,13 @@ class Order : public std::enable_shared_from_this<Order> {
     }
 
     void OnFried() {
+        ThreadChecker checker{counter_};
         net::post(strand_,
                   [self = shared_from_this()]() { self->AssembleHotDog(); });
     }
 
     void OnBaked() {
+        ThreadChecker checker{counter_};
         net::post(strand_,
                   [self = shared_from_this()]() { self->AssembleHotDog(); });
     }
