@@ -1,5 +1,7 @@
 #include "sdk.h"
-//
+// boost.beast будет использовать std::string_view вместо boost::string_view
+#define BOOST_BEAST_USE_STD_STRING_VIEW
+
 #include <boost/asio/signal_set.hpp>
 #include <iostream>
 #include <mutex>
