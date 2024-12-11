@@ -65,7 +65,8 @@ class RequestHandler {
             if (start_it != std::string::npos) {
                 auto target_str =
                     req.target().substr(ContentPath::GET_MAPS.size() + 1);
-                auto [status_code, body] = GetMapResponse(target_str);
+                auto [status_code, body] =
+                    GetMapResponse(std::string(target_str));
                 return text_response(status_code, body);
             }
         }
@@ -81,7 +82,7 @@ class RequestHandler {
         bool keep_alive,
         std::string_view content_type = ContentType::TEXT_HTML) {
         JsonResponse response(status, http_version);
-        response.set(http::field::content_type, content_type);
+        response.set(http::field::content_type, std::string(content_type));
         response.body() = body;
         response.content_length(body.size());
         response.keep_alive(keep_alive);
