@@ -54,11 +54,11 @@ class RequestHandler {
             };
 
         if (req.method() == http::verb::get) {
-            if (req.target() == ContentPath::GET_MAPS) {
+            if (req.target() == "/maps") {
                 return text_response(http::status::ok, GetMapsResponse());
             }
 
-            auto start_it = req.target().find("/maps/"sv);
+            auto start_it = req.target().find("/maps/");
 
             if (start_it != std::string::npos) {
                 auto target_str =
