@@ -106,10 +106,9 @@ model::Road json_converter::JsonToRoad(json::object road) {
     model::Point start{.x = static_cast<int>(road.at("x0").as_int64()),
                        .y = static_cast<int>(road.at("y0").as_int64())};
 
-    auto x_cord = road.try_at("x1");
-    if (x_cord) {
+    if (const auto value = road.if_contains("x1")) {
         return model::Road(model::Road::HORIZONTAL, start,
-                           static_cast<int>(x_cord->as_int64()));
+                           static_cast<int>(value->as_int64()));
     }
     return model::Road(model::Road::VERTICAL, start,
                        static_cast<int>(road.at("y1").as_int64()));
