@@ -10,6 +10,8 @@
 #include "json_converter.h"
 #include "model.h"
 
+#define BOOST_BEAST_USE_STD_STRING_VIEW
+
 namespace http_handler {
 namespace beast = boost::beast;
 namespace http = beast::http;

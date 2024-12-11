@@ -2,6 +2,7 @@
 
 #include <boost/json.hpp>
 #include <fstream>
+#include <sstream>
 #include <stdexcept>
 
 #include "boost/system/detail/error_code.hpp"
@@ -42,7 +43,16 @@ model::Game LoadGame(const std::filesystem::path& json_path) {
 
     std::ifstream json_input_stream(json_path);
     boost::system::error_code ec;
-    auto value = boost::json::parse(json_input_stream, ec);
+    std::ifstream inputFile("data.json");
+    if (!json_input_stream.is_open()) {
+        throw std::runtime_error("Incorrect input file");
+    }
+
+    std::stringstream buffer;
+    buffer << json_input_stream.rdbuf();
+    std::string jsonString = buffer.str();
+
+    auto value = boost::json::parse(jsonString, ec);
 
     if (ec) {
         throw std::runtime_error("Incorrect input file");
