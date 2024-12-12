@@ -36,6 +36,6 @@ model::Building JsonToBuilding(const json::object building_json);
 
 std::vector<model::Office> JsonToOffices(const json::array offices_json);
 
-model::Office JsonToOffice(const json::object office);
+model::Office JsonToOffice(const json::object office_json);
 
 }  // namespace json_converter
