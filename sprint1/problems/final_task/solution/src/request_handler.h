@@ -16,7 +16,7 @@ namespace http_handler {
 namespace beast = boost::beast;
 namespace http = beast::http;
 
-namespace {
+namespace detail {
 
 using namespace std::literals;
 
@@ -31,7 +31,7 @@ struct ContentPath {
     constexpr static std::string_view GET_MAPS = "/api/v1/maps";
 };
 
-}  // namespace
+}  // namespace detail
 
 class RequestHandler {
    public:
@@ -53,16 +53,16 @@ class RequestHandler {
             };
 
         if (req.method() == http::verb::get) {
-            if (req.target() == std::string(ContentPath::GET_MAPS)) {
+            if (req.target() == std::string(detail::ContentPath::GET_MAPS)) {
                 return text_response(http::status::ok, GetMapsResponse());
             }
 
             auto start_it =
-                req.target().find(std::string(ContentPath::GET_MAPS));
+                req.target().find(std::string(detail::ContentPath::GET_MAPS));
 
             if (start_it != std::string::npos) {
-                auto target_str =
-                    req.target().substr(ContentPath::GET_MAPS.size() + 1);
+                auto target_str = req.target().substr(
+                    detail::ContentPath::GET_MAPS.size() + 1);
                 auto [status_code, body] =
                     GetMapResponse(std::string(target_str));
                 return text_response(status_code, body);
@@ -76,18 +76,19 @@ class RequestHandler {
     model::Game& game_;
 
     JsonResponse MakeStringResponse(
-        http::status status, std::string_view body, unsigned http_version,
-        bool keep_alive,
-        std::string_view content_type = ContentType::JSON) const;
+        const http::status status, const std::string_view body,
+        const unsigned http_version, const bool keep_alive,
+        const std::string_view content_type = detail::ContentType::JSON) const;
 
     std::string GetMapsResponse() const;
 
-    std::pair<http::status, std::string> GetMapResponse(std::string id) const;
+    std::pair<http::status, std::string> GetMapResponse(
+        const std::string id) const;
 
     std::string GetBadResponse() const;
 
-    boost::json::object GetDefaultResponse(std::string code,
-                                           std::string message) const;
+    boost::json::object GetDefaultResponse(const std::string code,
+                                           const std::string message) const;
 };
 
 }  // namespace http_handler

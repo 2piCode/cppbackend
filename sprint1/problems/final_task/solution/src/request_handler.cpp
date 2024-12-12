@@ -3,8 +3,9 @@
 namespace http_handler {
 
 RequestHandler::JsonResponse RequestHandler::MakeStringResponse(
-    http::status status, std::string_view body, unsigned http_version,
-    bool keep_alive, std::string_view content_type) const {
+    const http::status status, const std::string_view body,
+    const unsigned http_version, const bool keep_alive,
+    const std::string_view content_type) const {
     JsonResponse response(status, http_version);
     response.set(http::field::content_type, std::string(content_type));
     response.body() = body;
@@ -22,7 +23,7 @@ std::string RequestHandler::GetMapsResponse() const {
 }
 
 std::pair<http::status, std::string> RequestHandler::GetMapResponse(
-    std::string id) const {
+    const std::string id) const {
     auto map = game_.FindMap(model::Map::Id{id});
     if (!map) {
         return std::make_pair(http::status::not_found,
@@ -40,7 +41,7 @@ std::string RequestHandler::GetBadResponse() const {
 }
 
 boost::json::object RequestHandler::GetDefaultResponse(
-    std::string code, std::string message) const {
+    const std::string code, const std::string message) const {
     boost::json::object main;
     main["code"] = code;
     main["message"] = message;

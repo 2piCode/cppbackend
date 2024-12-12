@@ -25,7 +25,8 @@ namespace beast = boost::beast;
 namespace http = beast::http;
 namespace sys = boost::system;
 
-inline void ReportError(beast::error_code ec, std::string_view what) {
+inline void ReportError(const beast::error_code ec,
+                        const std::string_view what) {
     using namespace std::literals;
     std::cerr << what << ": "sv << ec.message() << std::endl;
 }
@@ -63,10 +64,11 @@ class SessionBase {
 
     void Read();
 
-    void OnRead(beast::error_code ec, [[maybe_unused]] std::size_t bytes_read);
+    void OnRead(const beast::error_code ec,
+                [[maybe_unused]] const std::size_t bytes_read);
 
-    void OnWrite(bool close, beast::error_code ec,
-                 [[maybe_unused]] std::size_t bytes_written);
+    void OnWrite(const bool close, const beast::error_code ec,
+                 [[maybe_unused]] const std::size_t bytes_written);
 
     void Close();
 
@@ -128,7 +130,7 @@ class Listener : public std::enable_shared_from_this<Listener<RequestHandler>> {
                                       this->shared_from_this()));
     }
 
-    void OnAccept(sys::error_code ec, tcp::socket socket) {
+    void OnAccept(const sys::error_code ec, tcp::socket socket) {
         using namespace std::literals;
         if (ec) {
             return ReportError(ec, "accept"sv);

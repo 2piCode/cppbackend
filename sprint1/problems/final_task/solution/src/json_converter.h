@@ -24,18 +24,18 @@ boost::json::array OfficesToJson(const std::vector<model::Office>& offices);
 
 boost::json::object OfficeToJson(const model::Office& office);
 
-model::Map JsonToMap(json::object map);
+model::Map JsonToMap(const json::object map_json);
 
-std::vector<model::Road> JsonToRoads(json::array roads);
+std::vector<model::Road> JsonToRoads(const json::array roads_json);
 
-model::Road JsonToRoad(json::object road);
+model::Road JsonToRoad(const json::object road_json);
 
-std::vector<model::Building> JsonToBuildings(json::array buildings);
+std::vector<model::Building> JsonToBuildings(const json::array buildings_json);
 
-model::Building JsonToBuilding(json::object building);
+model::Building JsonToBuilding(const json::object building_json);
 
-std::vector<model::Office> JsonToOffices(json::array offices);
+std::vector<model::Office> JsonToOffices(const json::array offices_json);
 
-model::Office JsonToOffice(json::object office);
+model::Office JsonToOffice(const json::object office);
 
 }  // namespace json_converter

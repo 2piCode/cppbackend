@@ -43,7 +43,6 @@ model::Game LoadGame(const std::filesystem::path& json_path) {
 
     std::ifstream json_input_stream(json_path);
     boost::system::error_code ec;
-    std::ifstream inputFile("data.json");
     if (!json_input_stream.is_open()) {
         throw std::runtime_error("Incorrect input file");
     }
