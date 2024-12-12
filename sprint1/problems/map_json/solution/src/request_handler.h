@@ -30,7 +30,7 @@ struct ContentType {
 
 struct ContentPath {
     ContentPath() = delete;
-    constexpr static std::string GET_MAPS = "/maps";
+    constexpr static std::string_view GET_MAPS = "/api/v1/maps";
 };
 
 }  // namespace
@@ -56,11 +56,12 @@ class RequestHandler {
             };
 
         if (req.method() == http::verb::get) {
-            if (req.target() == ContentPath::GET_MAPS) {
+            if (req.target() == std::string(ContentPath::GET_MAPS)) {
                 return text_response(http::status::ok, GetMapsResponse());
             }
 
-            auto start_it = req.target().find(ContentPath::GET_MAPS);
+            auto start_it =
+                req.target().find(std::string(ContentPath::GET_MAPS));
 
             if (start_it != std::string::npos) {
                 auto target_str =
