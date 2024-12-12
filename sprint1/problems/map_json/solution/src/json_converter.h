@@ -10,6 +10,8 @@ namespace json = boost::json;
 
 json::object MapToJson(const model::Map& map);
 
+json::object FullMapToJson(const model::Map& map);
+
 json::array RoadsToJson(const std::vector<model::Road>& roads);
 
 json::object RoadToJson(const model::Road& road);

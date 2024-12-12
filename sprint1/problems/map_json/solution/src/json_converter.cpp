@@ -8,6 +8,12 @@ boost::json::object json_converter::MapToJson(const model::Map& map) {
     main["id"] = *map.GetId();
     main["name"] = map.GetName();
 
+    return main;
+}
+
+boost::json::object json_converter::FullMapToJson(const model::Map& map) {
+    auto main = MapToJson(map);
+
     main["roads"] = RoadsToJson(map.GetRoads());
     main["buildings"] = BuildingsToJson(map.GetBuildings());
     main["offices"] = OfficesToJson(map.GetOffices());

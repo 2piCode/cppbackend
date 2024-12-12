@@ -30,7 +30,7 @@ struct ContentType {
 
 struct ContentPath {
     ContentPath() = delete;
-    constexpr static std::string_view GET_MAPS = "/maps";
+    constexpr static std::string GET_MAPS = "/maps";
 };
 
 }  // namespace
@@ -56,11 +56,11 @@ class RequestHandler {
             };
 
         if (req.method() == http::verb::get) {
-            if (req.target() == "/maps") {
+            if (req.target() == ContentPath::GET_MAPS) {
                 return text_response(http::status::ok, GetMapsResponse());
             }
 
-            auto start_it = req.target().find("/maps/");
+            auto start_it = req.target().find(ContentPath::GET_MAPS);
 
             if (start_it != std::string::npos) {
                 auto target_str =
@@ -79,8 +79,7 @@ class RequestHandler {
 
     JsonResponse MakeStringResponse(
         http::status status, std::string_view body, unsigned http_version,
-        bool keep_alive,
-        std::string_view content_type = ContentType::TEXT_HTML) {
+        bool keep_alive, std::string_view content_type = ContentType::JSON) {
         JsonResponse response(status, http_version);
         response.set(http::field::content_type, std::string(content_type));
         response.body() = body;
@@ -90,13 +89,11 @@ class RequestHandler {
     }
 
     std::string GetMapsResponse() {
-        boost::json::object main;
         boost::json::array maps;
         for (const auto map : game_.GetMaps()) {
             maps.push_back(json_converter::MapToJson(map));
         }
-        main["maps"] = maps;
-        return boost::json::serialize(main);
+        return boost::json::serialize(maps);
     }
 
     std::pair<http::status, std::string> GetMapResponse(std::string id) {
@@ -107,7 +104,7 @@ class RequestHandler {
                                       "mapNotFound", "Map not found")));
         }
 
-        auto map_json = json_converter::MapToJson(*map);
+        auto map_json = json_converter::FullMapToJson(*map);
         return std::make_pair(http::status::ok,
                               boost::json::serialize(map_json));
     }
