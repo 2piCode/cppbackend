@@ -3,16 +3,20 @@
 #include <cstddef>
 #include <iostream>
 #include <utility>
-//
+
+#include "boost/beast/core/bind_handler.hpp"
+#include "boost/beast/core/error.hpp"
+#include "boost/beast/core/flat_buffer.hpp"
+#include "boost/beast/http/message.hpp"
+#include "boost/beast/http/string_body.hpp"
+#include "utils/sdk.h"
+// boost.beast будет использовать std::string_view вместо boost::string_view
+#define BOOST_BEAST_USE_STD_STRING_VIEW
+
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/strand.hpp>
 #include <boost/beast/core.hpp>
-#include <boost/beast/core/bind_handler.hpp>
-#include <boost/beast/core/error.hpp>
-#include <boost/beast/core/flat_buffer.hpp>
 #include <boost/beast/http.hpp>
-#include <boost/beast/http/message.hpp>
-#include <boost/beast/http/string_body.hpp>
 
 namespace http_server {
 

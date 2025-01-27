@@ -10,7 +10,7 @@ namespace app {
 
 class GameSessionHandler {
    public:
-    using GameSessionPointer = GameSession::Pointer;
+    using GameSessionPointer = std::shared_ptr<GameSession>;
 
     GameSessionHandler() = default;
     GameSessionHandler(const GameSessionHandler&) = delete;

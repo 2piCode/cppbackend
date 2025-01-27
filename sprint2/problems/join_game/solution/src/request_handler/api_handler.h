@@ -15,6 +15,7 @@
 #include "content_type.h"
 #include "json_converter.h"
 #include "model/model.h"
+#include "utils/logger.h"
 
 namespace api_handler {
 
@@ -90,6 +91,8 @@ class ApiHandler {
    private:
     using MapNotFoundAnswer = std::pair<http::status, std::string>;
     static constexpr boost::string_view NO_CACHE_KEY = "no-cache";
+    static constexpr boost::string_view USERNAME_KEY = "userName";
+    static constexpr boost::string_view MAP_ID_KEY = "mapId";
 
     app::Game& game_;
 
@@ -112,7 +115,8 @@ class ApiHandler {
         }
 
         boost::system::error_code ec;
-        auto json_body = boost::json::parse(body, ec);
+        const boost::json::value json_body_value = boost::json::parse(body, ec);
+
         if (ec) {
             return send(http::status::bad_request,
                         GetDefaultResponse("invalidArgument",
@@ -120,8 +124,18 @@ class ApiHandler {
                         request_handler::ContentType::JSON, NO_CACHE_KEY);
         }
 
+        const boost::json::object json_body = json_body_value.as_object();
+
+        if (!json_body.contains(USERNAME_KEY) ||
+            !json_body.contains(MAP_ID_KEY)) {
+            return send(
+                http::status::bad_request,
+                GetDefaultResponse("invalidArgument", "Invalid JSON body"),
+                request_handler::ContentType::JSON, NO_CACHE_KEY);
+        }
+
         const std::string username =
-            json_body.at("userName").as_string().c_str();
+            json_body.at(USERNAME_KEY).as_string().c_str();
 
         if (username.length() == 0) {
             return send(
@@ -131,7 +145,7 @@ class ApiHandler {
         }
 
         const auto map_id =
-            model::Map::Id{json_body.at("mapId").as_string().c_str()};
+            model::Map::Id{json_body.at(MAP_ID_KEY).as_string().c_str()};
 
         auto map_ptr = TryFindMap(map_id);
         if (std::holds_alternative<MapNotFoundAnswer>(map_ptr)) {
@@ -168,8 +182,8 @@ class ApiHandler {
                         request_handler::ContentType::JSON, NO_CACHE_KEY);
         }
 
-        const auto token_str = authorization_header.substr(6);
-
+        const auto token_str = authorization_header.substr(7);
+        BOOST_LOG_TRIVIAL(info) << "Token: " << token_str;
         app::Token token{std::string(token_str)};
 
         auto player = game_.FindPlayer(token);
@@ -180,11 +194,18 @@ class ApiHandler {
                         request_handler::ContentType::JSON, NO_CACHE_KEY);
         }
 
+        BOOST_LOG_TRIVIAL(info) << "Hello";
+        auto session = player->GetSession();
+
+        session->GetDogs();
+        BOOST_LOG_TRIVIAL(info) << "Huevo2";
         auto& dogs = player->GetSession()->GetDogs();
         boost::json::array players_json;
         for (const auto& dog : dogs) {
             players_json.push_back(json_converter::DogToJson(dog));
         }
+
+        BOOST_LOG_TRIVIAL(info) << "Huevo3";
 
         return send(http::status::ok, boost::json::serialize(players_json),
                     request_handler::ContentType::JSON, NO_CACHE_KEY);

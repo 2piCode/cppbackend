@@ -1,9 +1,9 @@
 #pragma once
 
+#include <deque>
 #include <string>
 #include <unordered_map>
 #include <utility>
-#include <vector>
 
 #include "game_session_handler.h"
 #include "model/model.h"
@@ -14,7 +14,7 @@ namespace app {
 class Game {
    public:
     using Map = model::Map;
-    using Maps = std::vector<model::Map>;
+    using Maps = std::deque<model::Map>;
     using MapPointer = Map*;
     using ConstMapPointer = const Map*;
     using PlayerPointer = Players::PlayerPointer;
@@ -55,7 +55,7 @@ class Game {
     using MapIdHasher = util::TaggedHasher<Map::Id>;
     using MapIdToIndex = std::unordered_map<Map::Id, size_t, MapIdHasher>;
 
-    std::vector<Map> maps_;
+    Maps maps_;
     MapIdToIndex map_id_to_index_;
     GameSessionHandler game_session_handler_;
     Players players_;
@@ -64,7 +64,7 @@ class Game {
         return game_session_handler_.FindGameSession(map_id);
     }
 
-    GameSessionHandler::GameSessionPointer CreateGameSession(const Map* map) {
+    GameSessionPointer CreateGameSession(const Map* map) {
         return game_session_handler_.CreateGameSession(map);
     }
 };

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <atomic>
+#include <algorithm>
+#include <iomanip>
 #include <random>
 #include <sstream>
 #include <string>
@@ -10,12 +11,18 @@
 
 #include "game_session.h"
 #include "model/model.h"
+#include "model/tagged.h"
+#include "utils/logger.h"
 
 namespace app {
 
 struct PlayerSession {
     model::Dog::Id dog_id;
     model::Map::Id map_id;
+
+    bool operator==(const PlayerSession& other) const {
+        return dog_id == other.dog_id && map_id == other.map_id;
+    }
 };
 
 class Player {
@@ -24,11 +31,11 @@ class Player {
     explicit Player(GameSessionPointer session, model::Dog* dog)
         : session_(session), dog_(dog) {}
 
-    GameSessionPointer GetSession() const { return session_; }
+    std::shared_ptr<GameSession> GetSession() const { return session_; }
     model::Dog* GetDog() const { return dog_; }
 
    private:
-    GameSessionPointer session_;
+    std::shared_ptr<GameSession> session_;
     model::Dog* dog_;
 };
 
@@ -51,31 +58,33 @@ class Players {
     Players(Players&& players)
         : players_(std::move(players.players_)),
           tokens_(std::move(players.tokens_)),
+          session_to_player_(std::move(players.session_to_player_)),
           token_to_player_(std::move(players.token_to_player_)),
           player_to_token_(std::move(players.player_to_token_)) {}
 
     std::pair<PlayerPointer, TokenPointer> Add(GameSessionPointer session,
                                                model::Dog* dog) {
         auto& player = players_.emplace_back(session, dog);
-        /*session_to_player_.emplace(*/
-        /*    PlayerSession{dog->GetId(), session->GetMapId()}, player);*/
+        session_to_player_.emplace(
+            PlayerSession{dog->GetId(), session->GetMapId()}, &player);
+
         auto& token = tokens_.emplace_back(GenerateToken());
-        token_to_player_.emplace(&token, &player);
-        player_to_token_.emplace(&player, &token);
+        token_to_player_.emplace(*token, &player);
+        player_to_token_.emplace(dog->GetId(), &token);
 
         return {&player, &token};
     }
 
     ConstPlayerPointer Find(PlayerSession session) const {
-        /*if (auto it = session_to_player_.find(session);*/
-        /*    it != session_to_player_.end()) {*/
-        /*    return it->second;*/
-        /*}*/
+        if (auto it = session_to_player_.find(session);
+            it != session_to_player_.end()) {
+            return it->second;
+        }
         return nullptr;
     }
 
-    ConstPlayerPointer Find(Token token) const {
-        if (auto it = token_to_player_.find(&token);
+    PlayerPointer Find(Token token) const {
+        if (auto it = token_to_player_.find(*token);
             it != token_to_player_.end()) {
             return it->second;
         }
@@ -83,7 +92,7 @@ class Players {
     }
 
     ConstTokenPointer FindToken(const Player& player) {
-        if (auto it = player_to_token_.find(&player);
+        if (auto it = player_to_token_.find(player.GetDog()->GetId());
             it != player_to_token_.end()) {
             return it->second;
         }
@@ -98,11 +107,14 @@ class Players {
         }
     };
 
-    std::vector<Player> players_;
-    std::vector<Token> tokens_;
-    /*std::unordered_map<PlayerSession, PlayerPointer> session_to_player_;*/
-    std::unordered_map<ConstTokenPointer, PlayerPointer> token_to_player_;
-    std::unordered_map<ConstPlayerPointer, TokenPointer> player_to_token_;
+    std::deque<Player> players_;
+    std::deque<Token> tokens_;
+    std::unordered_map<PlayerSession, PlayerPointer, PlayerSessionComparator>
+        session_to_player_;
+    std::unordered_map<std::string_view, PlayerPointer> token_to_player_;
+    std::unordered_map<model::Dog::Id, TokenPointer,
+                       util::TaggedHasher<model::Dog::Id>>
+        player_to_token_;
 
     std::random_device random_device_;
     std::mt19937_64 generator1_{[this] {
@@ -115,10 +127,20 @@ class Players {
     }()};
 
     std::string GenerateToken() {
-        std::stringstream ss1, ss2;
-        ss1 << std::hex << generator1_();
-        ss2 << std::hex << generator2_();
-        return ss1.str() + ss2.str();
+        std::string token_str;
+        do {
+            std::stringstream ss;
+            ss << std::hex << std::setw(16) << std::setfill('0')
+               << generator1_() << std::setw(16) << std::setfill('0')
+               << generator2_();
+
+            token_str = ss.str();
+        } while (std::find_if(tokens_.begin(), tokens_.end(),
+                              [&token_str](const auto& token) {
+                                  return (*token) == token_str;
+                              }) != tokens_.end() &&
+                 token_str.length() != 32);
+        return token_str;
     }
 };
 

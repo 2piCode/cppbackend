@@ -9,7 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
-find_package(Boost 1.78.0 REQUIRED log log_setup)
+find_package(Boost 1.78.0 REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
@@ -56,5 +56,4 @@ target_include_directories(
 target_link_libraries(
   game_server
   PRIVATE Threads::Threads
-  PRIVATE CONAN_PKG::boost
-  PRIVATE Boost::log)
+  PRIVATE CONAN_PKG::boost)

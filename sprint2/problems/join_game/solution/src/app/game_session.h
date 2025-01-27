@@ -1,7 +1,7 @@
 #pragma once
 
+#include <deque>
 #include <string>
-#include <vector>
 
 #include "model/model.h"
 
@@ -19,11 +19,11 @@ class GameSession {
     }
 
     const model::Map::Id GetMapId() const { return map_->GetId(); }
-    const std::vector<model::Dog>& GetDogs() const { return dogs_; }
+    const std::deque<model::Dog>& GetDogs() const { return dogs_; }
 
    private:
     const model::Map* map_;
-    std::vector<model::Dog> dogs_;
+    std::deque<model::Dog> dogs_;
 };
 
 }  // namespace app

@@ -5,12 +5,10 @@
 #include "request_handler.h"
 #include "utils/logger.h"
 
-#define BOOST_BEAST_USE_STD_STRING_VIEW
-
 class LoggingRequestHandler {
-    static void LogRequest(const boost::beast::string_view client_ip,
-                           const boost::beast::string_view uri,
-                           const boost::beast::string_view method) {
+    static void LogRequest(const boost::string_view client_ip,
+                           const boost::string_view uri,
+                           const boost::string_view method) {
         BOOST_LOG_TRIVIAL(info)
             << boost::log::add_value(
                    additional_data,
@@ -41,7 +39,7 @@ class LoggingRequestHandler {
 
     template <typename Body, typename Allocator, typename Send>
     void operator()(
-        boost::beast::string_view client_ip,
+        boost::string_view client_ip,
         request_handler::http::request<
             Body, request_handler::http::basic_fields<Allocator>>&& req,
         Send&& send) {

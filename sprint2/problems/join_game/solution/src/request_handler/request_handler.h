@@ -34,7 +34,6 @@ class RequestHandler : public std::enable_shared_from_this<RequestHandler> {
     template <typename Body, typename Allocator, typename Send>
     void operator()(http::request<Body, http::basic_fields<Allocator>>&& req,
                     Send&& send) {
-        BOOST_LOG_TRIVIAL(info) << "Hello8";
         using namespace std::literals;
         const auto response =
             [this, &req, &send](
@@ -47,36 +46,27 @@ class RequestHandler : public std::enable_shared_from_this<RequestHandler> {
                                                cache_control, allow));
             };
 
-        BOOST_LOG_TRIVIAL(info) << "Hello9";
-
         if (req.target().starts_with(api_handler::ApiHandler::API_KEY)) {
             return api_handler_(std::move(req), std::move(response));
         }
-
-        BOOST_LOG_TRIVIAL(info) << "Hello10";
 
         if (req.method() == http::verb::get) {
             std::optional<FileResponse> file_response =
                 ProcessGetFiles(req.target(), req.version(), req.keep_alive());
 
-            BOOST_LOG_TRIVIAL(info) << "Hello12";
-
             if (!file_response) {
-                BOOST_LOG_TRIVIAL(info) << "Hello13";
                 return response(http::status::not_found, "File not found");
             }
 
             return send(*file_response);
         }
-
-        BOOST_LOG_TRIVIAL(info) << "Hello11";
     }
 
    private:
     api_handler::ApiHandler& api_handler_;
     file_handler::FileHandler& file_handler_;
 
-    std::optional<FileResponse> ProcessGetFiles(std::string_view target,
+    std::optional<FileResponse> ProcessGetFiles(boost::string_view target,
                                                 unsigned http_version,
                                                 bool keep_alive) const;
 

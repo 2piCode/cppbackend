@@ -1,8 +1,5 @@
 #include "utils/sdk.h"
-
-// boost.beast будет использовать std::string_view вместо boost::string_view
-#define BOOST_BEAST_USE_STD_STRING_VIEW
-
+//
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/signal_set.hpp>
 #include <cstdlib>
@@ -74,13 +71,13 @@ int main(int argc, const char* argv[]) {
 
         const auto address = net::ip::make_address("0.0.0.0");
         constexpr net::ip::port_type port = 8080;
-        http_server::ServeHttp(
-            ioc, {address, port},
-            [&logging_handler](const boost::beast::string_view ip, auto&& req,
-                               auto&& send) {
-                logging_handler(ip, std::forward<decltype(req)>(req),
-                                std::forward<decltype(send)>(send));
-            });
+        http_server::ServeHttp(ioc, {address, port},
+                               [&logging_handler](const boost::string_view ip,
+                                                  auto&& req, auto&& send) {
+                                   logging_handler(
+                                       ip, std::forward<decltype(req)>(req),
+                                       std::forward<decltype(send)>(send));
+                               });
 
         BOOST_LOG_TRIVIAL(info)
             << boost::log::add_value(

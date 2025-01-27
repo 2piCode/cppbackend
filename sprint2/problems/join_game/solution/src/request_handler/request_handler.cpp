@@ -10,7 +10,7 @@
 namespace request_handler {
 
 std::optional<RequestHandler::FileResponse> RequestHandler::ProcessGetFiles(
-    std::string_view target, unsigned http_version, bool keep_alive) const {
+    boost::string_view target, unsigned http_version, bool keep_alive) const {
     FileResponse response;
 
     auto writer = [&response](http::file_body::value_type&& file,
