@@ -5,6 +5,18 @@
 
 namespace request_handler::file_handler {
 
+bool IsSubPath(std::filesystem::path path, std::filesystem::path base) {
+    path = std::filesystem::weakly_canonical(path);
+    base = std::filesystem::weakly_canonical(base);
+
+    for (auto b = base.begin(), p = path.begin(); b != base.end(); ++b, ++p) {
+        if (p == path.end() || *p != *b) {
+            return false;
+        }
+    }
+    return true;
+}
+
 FileHandler::FileHandler(std::filesystem::path static_files_root)
     : static_files_root_(std::filesystem::weakly_canonical(static_files_root)) {
 }
@@ -34,19 +46,6 @@ std::optional<FileResponse> FileHandler::operator()(
     std::transform(extension.begin(), extension.end(), extension.begin(),
                    ::tolower);
     return FileResponse{.file = std::move(file), .extension = extension};
-}
-
-bool FileHandler::IsSubPath(std::filesystem::path path,
-                            std::filesystem::path base) const {
-    path = std::filesystem::weakly_canonical(path);
-    base = std::filesystem::weakly_canonical(base);
-
-    for (auto b = base.begin(), p = path.begin(); b != base.end(); ++b, ++p) {
-        if (p == path.end() || *p != *b) {
-            return false;
-        }
-    }
-    return true;
 }
 
 std::string FileHandler::DecodePath(std::string&& path_str) const {

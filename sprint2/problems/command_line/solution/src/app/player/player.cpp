@@ -4,6 +4,10 @@
 
 namespace app {
 
+namespace detail {
+constexpr static double EPS = 1e-9;
+}
+
 model::Coordinate ClampPositionToRoad(const model::Road::Pointer& road,
                                       const model::Coordinate& pos) {
     auto start = road->GetStart();
@@ -24,17 +28,15 @@ model::Coordinate ClampPositionToRoad(const model::Road::Pointer& road,
 bool IsRoadContainsPoint(const model::Coordinate& point,
                          const model::Road::Pointer& road) {
     auto clamped = ClampPositionToRoad(road, point);
-    constexpr double EPS = 1e-9;
-    return (std::abs(clamped.x - point.x) < EPS) &&
-           (std::abs(clamped.y - point.y) < EPS);
+    return (std::abs(clamped.x - point.x) < detail::EPS) &&
+           (std::abs(clamped.y - point.y) < detail::EPS);
 }
 
 std::optional<model::Coordinate> FindClampedPositionIfOutside(
     const model::Road::Pointer& road, const model::Coordinate& new_position) {
     auto clamped = ClampPositionToRoad(road, new_position);
-    constexpr double EPS = 1e-9;
-    bool is_inside = (std::abs(clamped.x - new_position.x) < EPS) &&
-                     (std::abs(clamped.y - new_position.y) < EPS);
+    bool is_inside = (std::abs(clamped.x - new_position.x) < detail::EPS) &&
+                     (std::abs(clamped.y - new_position.y) < detail::EPS);
 
     if (is_inside) {
         return std::nullopt;
@@ -54,11 +56,15 @@ void Player::Move(std::chrono::milliseconds delta_time) {
         return;
     }
 
-    for (const auto& road : roads) {
-        if (IsRoadContainsPoint(new_position, road)) {
-            dog_->SetPosition(new_position);
-            return;
-        }
+    if (std::any_of(roads.begin(), roads.end(),
+                    [this, &new_position](const auto& road) {
+                        if (IsRoadContainsPoint(new_position, road)) {
+                            dog_->SetPosition(new_position);
+                            return true;
+                        }
+                        return false;
+                    })) {
+        return;
     }
     MoveToBorder(new_position, roads);
 }

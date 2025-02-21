@@ -24,7 +24,7 @@ set(REQUEST_HANDLER_SOURCES
 
 set(MODEL_SOURCES src/model/roads_handler.cpp)
 
-set(UTILS_SOURCES src/utils/boost_json.cpp)
+set(UTILS_SOURCES src/utils/boost_json.cpp src/utils/command_line_parser.cpp)
 
 set(HTTP_SERVER_SOURCES src/http_server/http_server.cpp)
 

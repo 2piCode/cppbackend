@@ -87,7 +87,8 @@ class RequestHandler : public std::enable_shared_from_this<RequestHandler> {
                                   const bool keep_alive,
                                   response_utils::StringResponse) const;
 
-    FileResponse MakeFileResponse(file_handler::FileResponse&& response) const;
+    FileResponse MakeFileResponse(
+        file_handler::FileResponse&& file_response) const;
 
     JsonResponse ReportServerError(const unsigned http_version,
                                    const bool keep_alive) const;

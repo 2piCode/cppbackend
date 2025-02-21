@@ -1,4 +1,3 @@
-#include "app/application.h"
 #include "utils/sdk.h"
 //
 #include <algorithm>

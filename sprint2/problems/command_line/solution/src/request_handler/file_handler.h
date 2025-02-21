@@ -17,18 +17,17 @@ struct FileResponse {
     std::string extension;
 };
 
+bool IsSubPath(std::filesystem::path path, std::filesystem::path base);
+
 class FileHandler {
    public:
-    FileHandler(std::filesystem::path static_files_root);
+    explicit FileHandler(std::filesystem::path static_files_root);
 
     std::optional<FileResponse> operator()(
         std::filesystem::path path_to_file) const;
 
    private:
     std::filesystem::path static_files_root_;
-
-    bool IsSubPath(std::filesystem::path path,
-                   std::filesystem::path base) const;
 
     std::string DecodePath(std::string&& path_str) const;
 };

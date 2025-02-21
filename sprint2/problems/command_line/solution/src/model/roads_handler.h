@@ -10,7 +10,7 @@ class RoadsHandler {
    public:
     using Roads = std::vector<std::shared_ptr<Road>>;
 
-    RoadsHandler(Roads roads) noexcept : roads_{std::move(roads)} {
+    explicit RoadsHandler(Roads roads) noexcept : roads_{std::move(roads)} {
         InitializeSegments();
     }
 
