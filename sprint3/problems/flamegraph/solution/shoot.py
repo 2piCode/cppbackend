@@ -51,16 +51,19 @@ def make_shots():
 def run_shell(command):
     subprocess.run(command, shell=True, check=True)
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
 
 server = run(start_server())
-time.sleep(1)
-perf_recorder = run(f"perf record -F 99 -p {server.pid} -g -o perf.data")
-make_shots()
+time.sleep(2)
 
-stop(perf_recorder)
+perf_recorder = run(f"perf record -p {server.pid} -g -o perf.data sleep 5")
+time.sleep(5)
+make_shots()
 stop(server)
 time.sleep(1)
 
-run_shell("perf script -i perf.data | ./FlameGraph/stackcollapse-perf.pl | ./FlameGraph/flamegraph.pl > graph.svg")
-print('graph.svg created')
+stop(perf_recorder)
 
+run_shell("perf script -i perf.data | ./FlameGraph/stackcollapse-perf.pl | ./FlameGraph/flamegraph.pl > graph.svg")
+print('Job done')
