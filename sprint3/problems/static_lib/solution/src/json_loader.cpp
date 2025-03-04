@@ -1,0 +1,87 @@
+#include "json_loader.h"
+
+#include <deque>
+#include <fstream>
+#include <memory>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <utility>
+
+#include <boost/json.hpp>
+#include <boost/system/detail/error_code.hpp>
+
+#include "json_converter.h"
+#include "loot_generator.h"
+
+namespace json_loader {
+
+boost::json::object ParseJson(const std::filesystem::path& json_path) {
+    std::ifstream json_input_stream(json_path);
+    boost::system::error_code ec;
+    if (!json_input_stream.is_open()) {
+        throw std::runtime_error("Incorrect input file");
+    }
+
+    std::stringstream buffer;
+    buffer << json_input_stream.rdbuf();
+    std::string jsonString = buffer.str();
+
+    auto value = boost::json::parse(jsonString, ec);
+
+    if (ec) {
+        throw std::runtime_error("Incorrect input file");
+    }
+
+    return value.as_object();
+}
+
+app::Game::Pointer LoadGame(const std::filesystem::path& json_path) {
+    auto json_object = ParseJson(json_path);
+    double default_dog_speed = 1.0;
+    if (auto default_dog_speed_it = json_object.find("defaultDogSpeed");
+        default_dog_speed_it != json_object.end()) {
+        default_dog_speed = default_dog_speed_it->value().as_double();
+    }
+
+    auto maps_json = json_object["maps"].as_array();
+    std::deque<model::Map::Pointer> maps;
+    for (const auto& map_json : maps_json) {
+        const auto map_json_object = map_json.as_object();
+        model::Map::Pointer map = json_converter::JsonToMap(map_json_object);
+        maps.push_back(map);
+    }
+
+    return std::make_shared<app::Game>(maps, default_dog_speed);
+}
+
+loot_gen::LootGenerator::Pointer LoadLootGenerator(
+    const std::filesystem::path& json_path) {
+    auto json_object = ParseJson(json_path);
+    auto lootGeneratorConfigObject =
+        json_object["lootGeneratorConfig"].as_object();
+    double period = lootGeneratorConfigObject["period"].as_double();
+    auto time_interval =
+        loot_gen::LootGenerator::TimeInterval(static_cast<int>(period));
+
+    return std::make_unique<loot_gen::LootGenerator>(
+        time_interval, lootGeneratorConfigObject["probability"].as_double());
+}
+
+LootHandler::Pointer LoadLootHandler(const std::filesystem::path& json_path) {
+    auto json_object = ParseJson(json_path);
+
+    auto maps_json = json_object["maps"].as_array();
+    LootHandler::LootTypeByMap loot_types_by_map;
+    for (const auto& map_json : maps_json) {
+        auto map_json_object = map_json.as_object();
+        model::Map::Id map_id =
+            json_converter::JsonToMap(map_json_object)->GetId();
+        loot_types_by_map.emplace(map_id,
+                                  map_json_object["lootTypes"].as_array());
+    }
+
+    return std::make_unique<LootHandler>(std::move(loot_types_by_map));
+}
+
+}  // namespace json_loader
