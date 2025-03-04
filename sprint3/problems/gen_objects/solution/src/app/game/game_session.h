@@ -35,7 +35,7 @@ class GameSession {
                 std::to_string(map_->GetNumberOfLootTypes()) +
                 " , but got: " + std::to_string(type));
         }
-        loot_positions_.push_back(Item{.type = type, .position = pos});
+        loot_positions_.emplace_back(type, pos);
     }
 
     const LootPositionsVector& GetLootPositionsInfo() const noexcept {

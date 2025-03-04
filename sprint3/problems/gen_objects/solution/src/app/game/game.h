@@ -23,6 +23,8 @@ class Game {
 
     virtual const Map::Pointer FindMap(const Map::Id& id) const noexcept;
 
+    GameSessionPointer CreateGameSession(const Map::Id& map_id);
+
     virtual GameSessionPointer FindGameSession(const Map::Id& map_id);
 
     double GetDefaultDogSpeed() const noexcept { return default_dog_speed_; }
@@ -35,8 +37,6 @@ class Game {
     MapIdToIndex map_id_to_index_;
     GameSessionHandler game_session_handler_;
     double default_dog_speed_;
-
-    GameSessionPointer CreateGameSession(const Map::Id& map_id);
 };
 
 }  // namespace app

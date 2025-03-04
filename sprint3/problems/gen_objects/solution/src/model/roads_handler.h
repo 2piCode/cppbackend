@@ -1,10 +1,17 @@
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include "model/model.h"
 
 namespace model {
+
+bool IsRoadContainsPoint(const model::Coordinate& point,
+                         const model::Road::Pointer& road);
+
+std::optional<model::Coordinate> FindClampedPositionIfOutside(
+    const model::Road::Pointer& road, const model::Coordinate& new_position);
 
 class RoadsHandler {
    public:

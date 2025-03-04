@@ -153,7 +153,7 @@ boost::json::object json_converter::PlayerInfoToJson(
                                 {PlayerInfoFields::NAME, player_info.name}}};
 }
 
-boost::json::object json_converter::ItemInfoToJson(const app::Item& item_info) {
+boost::json::object json_converter::ItemInfoToJson(app::Item item_info) {
     return boost::json::object{
         {"type", item_info.type},
         {"pos",

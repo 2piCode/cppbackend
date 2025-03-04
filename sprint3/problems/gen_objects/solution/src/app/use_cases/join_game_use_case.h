@@ -41,7 +41,12 @@ class JoinGameUseCase {
                                 JoinGameErrorReason::InvalidName);
         }
 
-        if (auto session = game_->FindGameSession(map_id); session) {
+        auto session = game_->FindGameSession(map_id);
+        if (!session) {
+            session = game_->CreateGameSession(map_id);
+        }
+
+        if (session) {
             auto map = session->GetMap();
             double dog_speed = game_->GetDefaultDogSpeed();
             if (map->GetMaxSpeed().has_value()) {

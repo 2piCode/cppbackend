@@ -50,8 +50,6 @@ class GameTickUseCase {
                                           session->GetDogs().size());
             for (size_t i = 0; i < count_items; i++) {
                 auto spawn_point = spawn_point_generator_.Generate(map);
-                BOOST_LOG_TRIVIAL(info) << "spawn point: x = " << spawn_point.x
-                                        << " y = " << spawn_point.y;
                 session->AddLoot(GenerateType(map->GetNumberOfLootTypes()),
                                  spawn_point);
             }

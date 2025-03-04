@@ -1,11 +1,11 @@
 #pragma once
 
 #include <chrono>
+#include <vector>
 
 #include "app/game/game_session.h"
 #include "model/dog.h"
 #include "model/model.h"
-#include "utils/logger.h"
 
 namespace app {
 

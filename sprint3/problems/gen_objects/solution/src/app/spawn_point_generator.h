@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <random>
 
 #include "model/map.h"
@@ -23,9 +24,11 @@ class SpawnPointGenerator {
         auto road = roads[distribution_roads(generator1_)];
 
         std::uniform_int_distribution<std::int32_t> distributionX(
-            road->GetStart().x, road->GetEnd().x);
+            std::min(road->GetStart().x, road->GetEnd().x),
+            std::max(road->GetStart().x, road->GetEnd().x));
         std::uniform_int_distribution<std::int32_t> distributionY(
-            road->GetStart().y, road->GetEnd().y);
+            std::min(road->GetStart().y, road->GetEnd().y),
+            std::max(road->GetStart().y, road->GetEnd().y));
 
         return {static_cast<double>(distributionX(generator1_)),
                 static_cast<double>(distributionY(generator1_))};

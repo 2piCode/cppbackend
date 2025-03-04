@@ -31,7 +31,7 @@ boost::json::object OfficeToJson(const model::Office& office);
 
 boost::json::object PlayerInfoToJson(const PlayerInfo& player_info);
 
-boost::json::object ItemInfoToJson(const app::Item& item_info);
+boost::json::object ItemInfoToJson(app::Item item_info);
 
 boost::json::object GameStateToJson(const GameState& game_state);
 

@@ -6,11 +6,11 @@
 
 #include <boost/json/object.hpp>
 
-#include "app/game/game.h"
 #include "app/game/game_session.h"
 #include "app/player/players.h"
 #include "app/token.h"
 #include "app/use_cases/base.h"
+#include "utils/logger.h"
 
 enum class GetGameStateErrorReason { UnknownToken };
 
@@ -31,7 +31,7 @@ struct PlayerGameState {
 
 struct GameState {
     std::vector<PlayerGameState> player_coord_infos;
-    const app::GameSession::LootPositionsVector& lost_objects;
+    std::vector<app::Item> lost_objects;
 };
 
 class GetGameStateUseCase {
@@ -48,14 +48,20 @@ class GetGameStateUseCase {
                                     GetGameStateErrorReason::UnknownToken};
         }
 
+        GameState result;
         auto session_ptr = player->GetSession();
-        GameState result{.lost_objects = session_ptr->GetLootPositionsInfo()};
         const auto& dogs = session_ptr->GetDogs();
         result.player_coord_infos.reserve(dogs.size());
         for (const auto& dog : dogs) {
             result.player_coord_infos.push_back({dog.GetId(), dog.GetPosition(),
                                                  dog.GetVelocity(),
                                                  dog.GetDirection()});
+        }
+
+        const auto& lost_objects = session_ptr->GetLootPositionsInfo();
+        result.lost_objects.reserve(lost_objects.size());
+        for (const auto& object : lost_objects) {
+            result.lost_objects.emplace_back(object.type, object.position);
         }
 
         return result;

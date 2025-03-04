@@ -65,6 +65,7 @@ add_executable(game_server_tests
     tests/get_game_state_tests.cpp
     tests/get_map_tests.cpp
     tests/tick_tests.cpp
+    tests/spawn_point_generator_tests.cpp
 )
 
 target_include_directories(game_server_tests PRIVATE  CONAN_PKG::boost src)

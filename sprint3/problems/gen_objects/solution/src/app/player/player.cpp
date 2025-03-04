@@ -2,47 +2,9 @@
 
 #include <algorithm>
 
+#include "model/roads_handler.h"
+
 namespace app {
-
-namespace detail {
-constexpr static double EPS = 1e-9;
-}
-
-model::Coordinate ClampPositionToRoad(const model::Road::Pointer& road,
-                                      const model::Coordinate& pos) {
-    auto start = road->GetStart();
-    auto end = road->GetEnd();
-
-    auto [min_x, max_x] = std::minmax(start.x, end.x);
-    auto [min_y, max_y] = std::minmax(start.y, end.y);
-
-    auto clamp = [](double val, double low, double high) {
-        return std::max(low, std::min(val, high));
-    };
-
-    return {
-        clamp(pos.x, min_x - model::Road::WIDTH, max_x + model::Road::WIDTH),
-        clamp(pos.y, min_y - model::Road::WIDTH, max_y + model::Road::WIDTH)};
-}
-
-bool IsRoadContainsPoint(const model::Coordinate& point,
-                         const model::Road::Pointer& road) {
-    auto clamped = ClampPositionToRoad(road, point);
-    return (std::abs(clamped.x - point.x) < detail::EPS) &&
-           (std::abs(clamped.y - point.y) < detail::EPS);
-}
-
-std::optional<model::Coordinate> FindClampedPositionIfOutside(
-    const model::Road::Pointer& road, const model::Coordinate& new_position) {
-    auto clamped = ClampPositionToRoad(road, new_position);
-    bool is_inside = (std::abs(clamped.x - new_position.x) < detail::EPS) &&
-                     (std::abs(clamped.y - new_position.y) < detail::EPS);
-
-    if (is_inside) {
-        return std::nullopt;
-    }
-    return clamped;
-}
 
 void Player::Move(std::chrono::milliseconds delta_time) {
     auto velocity = dog_->GetVelocity();

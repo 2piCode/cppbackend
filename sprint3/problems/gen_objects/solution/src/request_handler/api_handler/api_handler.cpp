@@ -10,7 +10,6 @@
 #include "app/application.h"
 #include "app/token.h"
 #include "json_converter.h"
-#include "model/model.h"
 #include "request_handler/api_handler/parsers/game_tick_request.h"
 #include "request_handler/api_handler/parsers/join_game_request.h"
 #include "request_handler/api_handler/parsers/player_action_request.h"

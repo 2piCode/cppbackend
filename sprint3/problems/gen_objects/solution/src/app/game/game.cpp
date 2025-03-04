@@ -20,12 +20,7 @@ const model::Map::Pointer Game::FindMap(const Map::Id& id) const noexcept {
 }
 
 GameSession::Pointer Game::FindGameSession(const Map::Id& map_id) {
-    auto game_session = game_session_handler_.FindGameSession(map_id);
-    if (!game_session) {
-        game_session = CreateGameSession(map_id);
-    }
-
-    return game_session;
+    return game_session_handler_.FindGameSession(map_id);
 }
 
 GameSession::Pointer Game::CreateGameSession(const Map::Id& map_id) {
