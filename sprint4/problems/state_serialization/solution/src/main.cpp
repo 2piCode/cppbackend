@@ -2,6 +2,7 @@
 //
 #include <algorithm>
 #include <cstdlib>
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -12,6 +13,7 @@
 #include <boost/archive/archive_exception.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/signal_set.hpp>
+#include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/trivial.hpp>
 
 #include "app/application.h"
@@ -63,9 +65,18 @@ void TrySaveApplicationState(app::Application::Pointer app_ptr,
         return;
     }
 
-    static std::filesystem::path temp_application_state_file("temp_file");
-    SaveApplicationState(app_ptr, temp_application_state_file);
-    std::filesystem::rename(temp_application_state_file, *state_file);
+    std::filesystem::path application_state_file = *state_file;
+    std::filesystem::path parent_dir = application_state_file.parent_path();
+
+    if (!std::filesystem::exists(parent_dir)) {
+        std::filesystem::create_directories(parent_dir);
+    }
+
+    std::filesystem::path temp_file = application_state_file;
+    temp_file += ".tmp";
+
+    SaveApplicationState(app_ptr, temp_file);
+    std::filesystem::rename(temp_file, application_state_file);
 }
 
 }  // namespace

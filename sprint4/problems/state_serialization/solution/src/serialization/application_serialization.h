@@ -175,6 +175,9 @@ class GameSessionRepr {
         for (const auto& dog : session.GetDogs()) {
             dogs_.emplace_back(dog);
         }
+        for (const auto& item : session.GetLootPositionsInfo()) {
+            items_.push_back(item);
+        }
     }
 
     template <typename Archive>

@@ -13,8 +13,8 @@ void SaveApplicationState(app::Application::Pointer app,
                           std::filesystem::path state_file) {
     std::ofstream ofs(state_file);
     if (!ofs.is_open()) {
-        BOOST_LOG_TRIVIAL(info)
-            << "Invalid state file: " << state_file.string();
+        BOOST_LOG_TRIVIAL(info) << "Invalid state file for saving application: "
+                                << state_file.string();
         return;
     }
 
@@ -29,7 +29,8 @@ std::optional<app::Application::Pointer> LoadApplicationState(
     std::ifstream ifs(state_file);
     if (!ifs.is_open()) {
         BOOST_LOG_TRIVIAL(info)
-            << "Invalid state file: " << state_file.string();
+            << "Invalid state file for loading application: "
+            << state_file.string();
         return std::nullopt;
     }
     serialization::ApplicationRepr app_repr;

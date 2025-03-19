@@ -167,6 +167,15 @@ void CheckGameStateEquality(const GameState& actual,
                   expected_player_game_state.items[j]);
         }
     }
+
+    for (size_t i = 0; i < actual.lost_objects.size(); i++) {
+        const model::Item &actual_item = actual.lost_objects[i],
+                          expected_item = expected.lost_objects[i];
+        CHECK(*actual_item.id == *expected_item.id);
+        CHECK(actual_item.type == expected_item.type);
+        CHECK(actual_item.value == expected_item.value);
+        CHECK(actual_item.position == expected_item.position);
+    }
 }
 
 SCENARIO_METHOD(Fixture, "Point serialization") {
@@ -695,6 +704,7 @@ SCENARIO_METHOD(Fixture, "Application serialization") {
             Game::Maps{map}, 1.0, std::make_shared<GameSessionHandler>());
         GameSession::Pointer game_session_ptr =
             game->CreateGameSession(map->GetId());
+        game_session_ptr->AddLoot(1, {2.1, 3.1}, 10);
 
         auto dog_ptr = [&game_session_ptr] {
             model::Dog::Pointer dog_ptr =
