@@ -23,10 +23,6 @@ CollectionResult TryCollectPoint(model::Coordinate a, model::Coordinate b,
     return CollectionResult(sq_distance, proj_ratio);
 }
 
-bool GatheringEventCompareByTime(GatheringEvent lhs, GatheringEvent rhs) {
-    return lhs.time < rhs.time;
-}
-
 std::vector<GatheringEvent> FindGatherEvents(
     const ItemGathererProvider& provider) {
     std::vector<GatheringEvent> result;
@@ -51,7 +47,12 @@ std::vector<GatheringEvent> FindGatherEvents(
         }
     }
 
-    std::sort(result.begin(), result.end(), GatheringEventCompareByTime);
+    std::function<bool(GatheringEvent lhs, GatheringEvent rhs)>
+        compare_by_time = [](GatheringEvent lhs, GatheringEvent rhs) {
+            return lhs.time < rhs.time;
+        };
+
+    std::sort(result.begin(), result.end(), compare_by_time);
 
     return result;
 }

@@ -40,61 +40,26 @@ class Application {
                          LootHandler::Pointer loot_handler,
                          LootNumberMapHandler::Pointer loot_number_map_handler,
                          bool is_random_spawn_point,
-                         std::shared_ptr<postgres::UnitOfWorkFactory> factory)
-        : players_(players),
-          game_(game),
-          loot_generator_(loot_generator),
-          loot_handler_(loot_handler),
-          loot_number_map_handler_(loot_number_map_handler),
-          is_random_spawn_point_(is_random_spawn_point),
-          join_game_use_case_(game_, players_, is_random_spawn_point_),
-          list_map_use_case_(game_),
-          get_map_use_case_(game_, loot_handler_),
-          list_player_use_case_(players_),
-          get_game_state_use_case_(players_),
-          move_player_use_case_(players_),
-          game_tick_use_case_(game_, players_, loot_generator_, loot_handler_,
-                              loot_number_map_handler_, factory),
-          get_game_records_use_case_(factory) {}
+                         std::shared_ptr<postgres::UnitOfWorkFactory> factory);
 
-    Game::Maps ListMaps() const { return list_map_use_case_.GetMaps(); }
+    Game::Maps ListMaps() const;
 
-    GetMapResult GetMap(const model::Map::Id& map_id) const {
-        return get_map_use_case_.GetMap(map_id);
-    }
-
+    GetMapResult GetMap(const model::Map::Id& map_id) const;
     JoinGameResult JoinGame(model::Map::Id map_id,
-                            const std::string& user_name) {
-        return join_game_use_case_.Join(map_id, user_name);
-    }
+                            const std::string& user_name);
 
-    ListPlayerResult ListPlayers(const app::Token token) const {
-        return list_player_use_case_.GetPlayers(token);
-    }
+    ListPlayerResult ListPlayers(const app::Token token) const;
 
-    GameState GetGameState(const app::Token token) const {
-        return get_game_state_use_case_.GetGameState(token);
-    }
+    GameState GetGameState(const app::Token token) const;
 
-    void MovePlayer(const app::Token token, const model::Direction direction) {
-        return move_player_use_case_.MovePlayer(token, direction);
-    }
+    void MovePlayer(const app::Token token, const model::Direction direction);
 
-    void Tick(std::chrono::milliseconds delta_time) {
-        game_tick_use_case_.Tick(delta_time);
-        tick_signal_(delta_time);
-    }
+    void Tick(std::chrono::milliseconds delta_time);
 
     [[nodiscard]] boost::signals2::connection DoOnTick(
-        const TickSignal::slot_type& handler) {
-        return tick_signal_.connect(handler);
-    }
+        const TickSignal::slot_type& handler);
 
-    bool GetIsRandomSpawnPoint() const { return is_random_spawn_point_; }
-
-    std::vector<GameRecord> GetGameRecords(int start, int max_items) {
-        return get_game_records_use_case_.GetGameRecords(start, max_items);
-    }
+    std::vector<GameRecord> GetGameRecords(int start, int max_items);
 
    private:
     Players::Pointer players_;

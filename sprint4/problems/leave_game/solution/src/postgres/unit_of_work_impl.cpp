@@ -32,8 +32,6 @@ PlayerRepositoryImpl& Database::GetPlayers() { return players_; }
 UnitOfWorkImpl::UnitOfWorkImpl(ConnectionPool::ConnectionWrapper wrapper)
     : wrapper_(std::move(wrapper)), db_(work_) {}
 
-UnitOfWorkImpl::~UnitOfWorkImpl() { Commit(); }
-
 void UnitOfWorkImpl::Commit() { work_.commit(); }
 
 PlayerRepository& UnitOfWorkImpl::GetPlayers() { return db_.GetPlayers(); }

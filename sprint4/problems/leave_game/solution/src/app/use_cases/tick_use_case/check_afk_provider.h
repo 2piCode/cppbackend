@@ -44,6 +44,8 @@ class CheckAFKProvider {
                 std::chrono::duration_cast<std::chrono::duration<double>>(
                     dog.GetTimeInGame())
                     .count()};
-        factory_->CreateUnitOfWork()->GetPlayers().Write(info);
+        auto unit_of_work = factory_->CreateUnitOfWork();
+        unit_of_work->GetPlayers().Write(info);
+        unit_of_work->Commit();
     }
 };

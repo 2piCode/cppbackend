@@ -31,13 +31,14 @@ set(HTTP_SERVER_SOURCES src/http_server/http_server.cpp)
 set(APP_SOURCES
     src/app/game/game.cpp src/app/game/game_session_handler.cpp
     src/app/player/player.cpp src/app/player/players.cpp
-    src/app/collision_detector.cpp)
+    src/app/collision_detector.cpp src/app/application.cpp)
 
 set(LOOT_GENERATOR_SOURCES src/loots/loot_generator.cpp)
 
 set(SERIALIZATION src/serialization/application_state.cpp)
 
-set(POSTGRES_SOURCES src/postgres/repository_impl.cpp src/postgres/unit_of_work_impl.cpp)
+set(POSTGRES_SOURCES src/postgres/repository_impl.cpp
+                     src/postgres/unit_of_work_impl.cpp)
 
 add_library(game_server_lib STATIC ${MODEL_SOURCES} ${APP_SOURCES}
                                    ${LOOT_GENERATOR_SOURCES})
@@ -47,22 +48,25 @@ target_link_libraries(game_server_lib PUBLIC CONAN_PKG::boost Threads::Threads)
 
 add_executable(
   game_server
-  src/main.cpp src/json_loader.cpp src/json_converter.cpp
-  ${HTTP_SERVER_SOURCES} ${UTILS_SOURCES} ${REQUEST_HANDLER_SOURCES} ${SERIALIZATION} ${POSTGRES_SOURCES})
+  src/main.cpp
+  src/json_loader.cpp
+  src/json_converter.cpp
+  ${HTTP_SERVER_SOURCES}
+  ${UTILS_SOURCES}
+  ${REQUEST_HANDLER_SOURCES}
+  ${SERIALIZATION}
+  ${POSTGRES_SOURCES})
 
-# add_executable(
-#   game_server_tests
-#   src/utils/boost_json.cpp
-#   tests/loot_generator_tests.cpp
-#   tests/get_game_state_tests.cpp
-#   tests/get_map_tests.cpp
-#   tests/tick_tests.cpp
-#   tests/spawn_point_generator_tests.cpp
-#   tests/state-serialization-tests.cpp ${POSTGRES_SOURCES})
+# add_executable( game_server_tests src/utils/boost_json.cpp
+# tests/loot_generator_tests.cpp tests/get_game_state_tests.cpp
+# tests/get_map_tests.cpp tests/tick_tests.cpp
+# tests/spawn_point_generator_tests.cpp tests/state-serialization-tests.cpp
+# ${POSTGRES_SOURCES})
 
-target_link_libraries(game_server game_server_lib CONAN_PKG::libpq CONAN_PKG::libpqxx)
-# target_link_libraries(game_server_tests game_server_lib CONAN_PKG::catch2 CONAN_PKG::libpq CONAN_PKG::libpqxx)
+target_link_libraries(game_server game_server_lib CONAN_PKG::libpq
+                      CONAN_PKG::libpqxx)
+# target_link_libraries(game_server_tests game_server_lib CONAN_PKG::catch2
+# CONAN_PKG::libpq CONAN_PKG::libpqxx)
 
-# include(CTest)
-# include(${CONAN_BUILD_DIRS_CATCH2}/Catch.cmake)
+# include(CTest) include(${CONAN_BUILD_DIRS_CATCH2}/Catch.cmake)
 # catch_discover_tests(game_server_tests)

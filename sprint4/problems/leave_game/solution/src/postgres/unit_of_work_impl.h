@@ -26,8 +26,6 @@ class UnitOfWorkImpl : public UnitOfWork {
    public:
     explicit UnitOfWorkImpl(ConnectionPool::ConnectionWrapper wrapper);
 
-    ~UnitOfWorkImpl() override;
-
     void Commit() override;
     PlayerRepository& GetPlayers() override;
 

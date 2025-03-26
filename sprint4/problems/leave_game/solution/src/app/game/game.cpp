@@ -9,8 +9,8 @@ Game::Game(Maps maps, double default_dog_speed,
            GameSessionHandler::Pointer handler,
            std::chrono::milliseconds dog_retirement_time)
     : maps_(std::move(maps)),
-      default_dog_speed_(default_dog_speed),
       game_session_handler_(handler),
+      default_dog_speed_(default_dog_speed),
       dog_retirement_time_(dog_retirement_time) {
     for (size_t i = 0; i < maps_.size(); ++i) {
         map_id_to_index_[maps_[i]->GetId()] = i;
